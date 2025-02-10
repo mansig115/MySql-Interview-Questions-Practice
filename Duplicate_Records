@@ -1,0 +1,7 @@
+How do you find duplicate records in a table?
+Select EmpID, EmpName, count(*) as DuplicateCount from Employees group by EmpID, EmpName having count(*) > 1;
+
+Remove duplicate records (keeping one instance)
+Delete from Employees where EmpID IN(Select EmpID from(Select EmpID , row_number() over(partition by EmpID order by EmpID) as rowNumber from Employees ) as
+temp where 
+rowNumber > 1);
