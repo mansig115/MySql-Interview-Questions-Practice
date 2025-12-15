@@ -1,5 +1,6 @@
 SELECT * FROM school_db.marks;
 Insert into students values('108', 'Aisha', 'Dehradun');
+Insert into students values('109','Rahul','Delhi'),('110', 'Priya', 'Mumbai');
 -- Five Questions Mixing INNER + LEFT JOIN
 -- 1.	Display all students and their marks, but also show only those subjects that match using INNER JOIN inside a LEFT JOIN scenario 
 Select S.name, M.marks from Students S left join Marks M on S.student_id = M.student_id AND M.subject IS NOT NULL;
@@ -71,3 +72,33 @@ Select S.student_id, S.name, M.subject, M.marks from Students S Right Join Marks
 SELECT student_id FROM Students
 UNION
 SELECT student_id FROM Marks;
+
+
+-- SELF JOIN
+-- 1 Find students who belong to the same city as other students.
+Select s1.name as student1,
+s2.name as student2, s1.city From students s1 join students s2 ON s1.city = s2.city and s1.student_id <> s2.student_id ;
+
+
+-- 2 Find students who have the same name but different student IDs.
+ Select s1.name as student1, s2.name as student2 from Students s1 join
+ Students s2 on s1.name = s2.name and s1.student_id <> s2.student_id;
+
+
+-- 3 Compare marks of the same student in different subjects.
+Select  m1.student_id,
+    m1.subject AS subject_1,
+    m1.marks AS marks_1,
+    m2.subject AS subject_2,
+    m2.marks AS marks_2 FROM marks m1
+JOIN marks m2
+    ON m1.student_id = m2.student_id
+   AND m1.subject <> m2.subject;
+   
+   -- CROSS JOIN
+   
+   -- 1 Generate all possible combinations of students and subjects.
+   Select s.name, m.subject From students s cross join marks m;
+   
+   -- 2 Assign every student to every subject (theoretical scenario).
+   Select s.student_id, s.name, m.subject from students s Cross join (Select Distinct subject from marks) as m;
