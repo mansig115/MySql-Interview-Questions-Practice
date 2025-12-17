@@ -1,0 +1,29 @@
+-- Subquery
+   Select * from students;
+   -- 1 Find students who scored more than the average marks of their own subject.
+   Select s.student_id, s.name from students s join marks m on s.student_id = m.student_id
+   where m.marks > (Select avg(m1.marks) from marks m1 where m1.subject = m.subject);
+   
+-- 2 Find students whose marks are the highest in their respective subject.
+ Select s.student_id, s.name, m.subject from students s join marks m on s.student_id = m.student_id
+   where m.marks = (Select max(m1.marks) from marks m1 where m1.subject = m.subject);
+   
+   
+-- 3 Insert into students all distinct student_ids from the marks table who are not already present in the students table.
+INSERT INTO students (student_id) SELECT DISTINCT m.student_id FROM marks m
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM students s
+    WHERE s.student_id = m.student_id
+);
+
+
+-- 4 Insert students into the students table who have scored more than 80 in any subject.
+INSERT INTO students(student_id)
+SELECT DISTINCT m.student_id From marks m where m.marks > 80 AND Not EXISTS(Select 1 from students s where s.student_id = m.student_id);
+
+-- 5 Update the city of students to 'Topper City' for students whose average marks are greater than 85.
+Update students SET city = "Topper City" 
+where student_id IN(Select student_id from marks group by student_id having avg(marks) > 85);
+
+-- 6 Update marks by adding 5 bonus marks for students whose total marks across all subjects are greater than the overall average total marks.
