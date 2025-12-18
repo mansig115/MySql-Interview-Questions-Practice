@@ -26,4 +26,22 @@ SELECT DISTINCT m.student_id From marks m where m.marks > 80 AND Not EXISTS(Sele
 Update students SET city = "Topper City" 
 where student_id IN(Select student_id from marks group by student_id having avg(marks) > 85);
 
--- 6 Update marks by adding 5 bonus marks for students whose total marks across all subjects are greater than the overall average total marks.
+-- 6. Students Scoring Above Their Own Average
+Select s.student_id, s.name, m.marks  from students s join marks m on s.student_id = m.student_id where m.marks > (Select avg(m1.marks) from Marks m1  where m1.student_id
+ = m.student_id);
+
+
+-- 7. Subjects with Above Overall Average Marks
+Select subject from marks  group by subject HAVING avg(marks) > (Select avg(marks) from marks);
+
+-- 8. Students Who Never Scored Below 60
+Select  s.student_id, s.name from students s where not exists(select 1 from marks m where m.student_id = s.student_id and m.marks < 60);
+
+-- 9. Students with Same Marks in Multiple Subjects
+Select s.name, m.subject, m.marks from students s join marks m on s.student_id = m.student_id where (m.student_id, m.marks) 
+IN (Select student_id, marks from marks group by student_id, marks having count(Distinct subject) > 1);
+
+
+-- 10. Students Who Scored in All Subjects
+Select s.student_id, s.name from students s join marks m on s.student_id = m.student_id GROUP BY s.student_id, s.name HAVING count(distinct m.subject) = (Select 
+count(Distinct subject) From marks);
