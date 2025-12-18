@@ -1,0 +1,68 @@
+-- 1. Average Marks per Student
+
+-- Question:
+-- Create a CTE to calculate the average marks for each student, then display students whose average is greater than 75.
+
+-- Answer:
+
+WITH StudentAvg AS (
+    SELECT student_id, AVG(marks) AS avg_marks
+    FROM marks
+    GROUP BY student_id
+)
+SELECT s.student_id, s.name, sa.avg_marks
+FROM students s
+JOIN StudentAvg sa ON s.student_id = sa.student_id
+WHERE sa.avg_marks > 75;
+
+-- 2. Subject-wise Average Marks
+
+-- Question:
+-- Use a CTE to calculate average marks per subject, then list all subjects along with their average marks.
+
+
+WITH SubjectAvg AS (
+    SELECT subject, AVG(marks) AS avg_marks
+    FROM marks
+    GROUP BY subject
+)
+SELECT *
+FROM SubjectAvg;
+
+-- 🔸 Medium Level-- 
+-- 3. Top Scorer per Subject
+
+-- Question:
+-- Create a CTE to find the highest marks in each subject, then display the student name and subject who achieved those marks.
+
+
+
+WITH MaxMarks AS (
+    SELECT subject, MAX(marks) AS top_marks
+    FROM marks
+    GROUP BY subject
+)
+SELECT s.name, m.subject, m.marks
+FROM marks m
+JOIN students s ON m.student_id = s.student_id
+JOIN MaxMarks mm ON m.subject = mm.subject AND m.marks = mm.top_marks;
+
+-- 4. Students with Above-Overall Average
+
+-- Question:
+-- Use a CTE to calculate the overall average marks, then find students whose average marks are above the overall average.
+
+WITH OverallAvg AS (
+    SELECT AVG(marks) AS avg_marks
+    FROM marks
+),
+StudentAvg AS (
+    SELECT student_id, AVG(marks) AS avg_marks
+    FROM marks
+    GROUP BY student_id
+)
+SELECT s.student_id, s.name, sa.avg_marks
+FROM StudentAvg sa
+JOIN students s ON sa.student_id = s.student_id
+JOIN OverallAvg oa ON sa.avg_marks > oa.avg_marks;
+
