@@ -1,0 +1,35 @@
+-- EASY LEVEL
+
+-- Average marks per student
+-- 👉 Create a CTE to calculate average marks of each student, then JOIN with students to show student name and average marks.
+With CTE as (Select s.student_id, s.name, avg(m.marks) as avg_marks from  students s join marks m  on m.student_id = s.student_id group by s.student_id, s.name)
+Select * from CTE;
+
+With avg_marks_cte as(Select student_id, avg(marks) as avg_marks from marks group by student_id)
+Select s.student_id, s.name, a.avg_marks from students s join avg_marks_cte a on s.student_id = a.student_id;
+
+
+-- Total marks per student
+-- 👉 Use a CTE to calculate total marks, then JOIN to display student name and total marks.
+With total_marks_cte as (Select student_id, sum(marks) as total_marks from marks group by student_id)
+Select s.student_id, s.name, t.total_marks from students s join total_marks_cte t on s.student_id = t.student_id;
+
+-- Subject-wise average marks
+-- 👉 Create a CTE for subject-wise average marks and display subject and average.
+With subject_avg_marks as(Select subject, avg(marks) as avg_marks from marks group by subject)
+Select subject, avg_marks from subject_avg_marks;
+
+
+
+-- 🟡 MEDIUM LEVEL
+
+-- Students scoring above their average
+-- 👉 Create a CTE to calculate average marks per student, then JOIN it with marks to find subjects where the student scored above their own average.
+With avg_marks_per_student as (Select student_id, round(avg(marks),2) as avg_marks from marks group by student_id)
+Select m.student_id, m.subject, m.marks, a.avg_marks from marks m join avg_marks_per_student a on m.student_id = a.student_id where m.marks > a.avg_marks;
+
+
+-- Students who failed in any subject (marks < 60)
+-- 👉 Create a CTE to find students who scored below 60, then JOIN with students to display names.
+With score_less_cte as(Select student_id, marks from marks where marks < 60)
+Select s.student_id, s.name, sc.marks from students s join score_less_cte sc on s.student_id = sc.student_id;
