@@ -33,3 +33,40 @@ Select m.student_id, m.subject, m.marks, a.avg_marks from marks m join avg_marks
 -- 👉 Create a CTE to find students who scored below 60, then JOIN with students to display names.
 With score_less_cte as(Select student_id, marks from marks where marks < 60)
 Select s.student_id, s.name, sc.marks from students s join score_less_cte sc on s.student_id = sc.student_id;
+
+
+
+
+-- 🔴 HARD LEVEL
+
+-- Rank students by average marks
+-- 👉 Create a CTE to calculate average marks per student and assign ranks using RANK().
+With student_rank as(Select student_id, avg(marks) as avg_marks, rank() over(order by avg(marks) desc) as rn  from marks group by student_id)
+Select student_id, avg_marks, rn from student_rank;
+
+-- Subjects where class average is above 75
+-- 👉 Use a CTE to calculate subject-wise average, then filter subjects with avg > 75.
+With subject_avg as(Select subject, avg(marks) as  avg_marks from marks group by subject)
+Select * from subject_avg where avg_marks > 75;
+
+-- Students who scored higher than subject average
+-- 👉 Create a CTE to calculate subject average, then JOIN with marks to find students scoring above subject average.
+With high_score as(Select subject, avg(marks) as avg_marks from marks group by subject)
+Select m.student_id, m.subject, m.marks, h.avg_marks from marks m join high_score h on m.subject = h.subject where m.marks > h.avg_marks;
+
+-- 🟡 Question 1: Top Scorer per Subject
+
+-- 👉 Create a CTE to rank students within each subject based on marks and display only the top scorer(s) per subject.
+
+With top_scorer_student as(Select student_id, subject, marks, rank() over(partition by subject order by marks desc) as student_rank from marks)
+Select student_id, subject, marks from top_scorer_student where student_rank = 1;
+
+
+
+-- 🔴 Question 2: Students Above Overall Class Average
+
+-- 👉 Create a CTE to calculate the overall class average marks, then find students whose average marks are above the class average.
+
+With class_avg_marks as (Select avg(marks) as overall_avg from marks),
+student_avg_marks as (Select student_id, avg(marks) as student_avg from marks group by student_id)
+Select s.student_id, s.student_avg from student_avg_marks s cross join class_avg_marks c where s.student_avg > c.overall_avg; 
